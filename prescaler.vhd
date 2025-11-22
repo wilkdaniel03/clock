@@ -11,7 +11,7 @@ architecture arch of prescaler is
 	signal first_det_max : std_logic := '0';
 begin
 	first_counter : entity work.counter port map(clk => clk, en => '1', rst => first_det_max, dout => first_dout);
-	first_det_max <= first_dout(3) and first_dout(0);
+	first_det_max <= first_dout(3) and first_dout(1);
 	current(6) <= first_det_max;
 
 	counters : for i in 5 downto 0 generate
@@ -19,7 +19,7 @@ begin
 		signal dout_det_max : std_logic := '0';
 	begin
 		counter : entity work.counter port map(clk => clk, en => current(i+1), rst => dout_det_max, dout => dout);
-		dout_det_max <= dout(3) and dout(0);
+		dout_det_max <= dout(3) and dout(1);
 		current(i) <= dout_det_max;
 	end generate;
 
