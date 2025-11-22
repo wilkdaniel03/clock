@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity counter is
-	port(clk,en : in std_logic; rst : in std_logic := '0'; dout : out std_logic_vector(3 downto 0));
+	port(clk : in std_logic; en : in std_logic := '1'; rst : in std_logic := '0'; dout : out std_logic_vector(3 downto 0));
 end counter;
 
 architecture arch of counter is
