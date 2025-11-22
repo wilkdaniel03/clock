@@ -10,11 +10,13 @@ architecture arch of counter is
 begin
 	dout <= current;
 process(clk,rst) begin
-	if rising_edge(clk) and en = '1' then
-		current(3) <= (current(3) and (not(current(2) and current(1) and current(0)))) or (not(current(3)) and current(2) and current(1) and current(0));
-		current(2) <= (not(current(2)) and current(1) and current(0)) or (current(2) and (current(1) nand current(0)));
-		current(1) <= current(1) xor current(0);
-		current(0) <= not(current(0));
+	if rising_edge(clk) then
+		if en = '1' then
+			current(3) <= (current(3) and (not(current(2) and current(1) and current(0)))) or (not(current(3)) and current(2) and current(1) and current(0));
+			current(2) <= (not(current(2)) and current(1) and current(0)) or (current(2) and (current(1) nand current(0)));
+			current(1) <= current(1) xor current(0);
+			current(0) <= not(current(0));
+		end if;
 		if rst = '1' then
 			current <= "0000";
 		end if;
