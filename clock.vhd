@@ -12,6 +12,7 @@ end clock;
 architecture arch of clock is
 	signal prescaler_out : std_logic_vector(6 downto 0) := "0000000";
 	signal clk_in : std_logic := '0';
+	signal clk_in_cond : std_logic := '0';
 	signal clk_5_out : std_logic_vector(3 downto 0) := "0000";
 	signal clk_5_det_max : std_logic := '0';
 	signal counter_out : std_logic_vector(3 downto 0) := "0000";
@@ -21,17 +22,18 @@ architecture arch of clock is
 	signal seg_enc3_out : std_logic_vector(6 downto 0) := "0000000";
 	signal seg_enc4_out : std_logic_vector(6 downto 0) := "0000000";
 	signal btn_din : std_logic_vector(2 downto 0) := "000";
-	signal mode : std_logic_vector(2 downto 0) := "000";
+	signal mode_dout : std_logic_vector(2 downto 0) := "000";
 begin
 	prescaler : entity work.prescaler port map(clk => clk, y => prescaler_out);
 	clk_in <= prescaler_out(0) when btn = '1' else prescaler_out(2);
-	counter_5 : entity work.counter port map(clk => clk, en => clk_in, rst => clk_5_det_max, dout => clk_5_out);
+	clk_in_cond <= clk_in when mode_dout(2) = '1' else prescaler_out(1);
+	counter_5 : entity work.counter port map(clk => clk, en => clk_in_cond, rst => clk_5_det_max, dout => clk_5_out);
 	clk_5_det_max <= clk_5_out(2) and clk_5_out(1);
-	segments : entity work.segments port map(clk => clk, en => clk_5_det_max, seg1 => seg_enc1_out, seg2 => seg_enc2_out, seg3 => seg_enc3_out, seg4 => seg_enc4_out);
+	segments : entity work.segments port map(clk => clk, en => clk_5_det_max, modes => mode_dout, seg1 => seg_enc1_out, seg2 => seg_enc2_out, seg3 => seg_enc3_out, seg4 => seg_enc4_out);
 	btn_din(2) <= not btn1;
 	btn_din(1) <= not btn2;
 	btn_din(0) <= not btn3;
-	mode : entity work.mode port map(clk => clk, btn1 => btn_din(2), btn2 => btn_din(1), btn3 => btn_din(0), y3 => mode(2), mode(1)=> y2, y1 => mode(0));
+	mode : entity work.mode port map(clk => clk, btn1 => btn_din(2), btn2 => btn_din(1), btn3 => btn_din(0), y3 => mode_dout(2), y2 => mode_dout(1), y1 => mode_dout(0));
 	seg11 <= seg_enc1_out(6);
 	seg12 <= seg_enc1_out(5);
 	seg13 <= seg_enc1_out(4);
