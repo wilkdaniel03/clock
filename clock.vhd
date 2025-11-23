@@ -2,11 +2,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity clock is
-	port(clk,btn : in std_logic;
+	port(clk,btn,btn1,btn2,btn3 : in std_logic;
 	seg11,seg12,seg13,seg14,seg15,seg16,seg17,
 	seg21,seg22,seg23,seg24,seg25,seg26,seg27,
 	seg31,seg32,seg33,seg34,seg35,seg36,seg37,
-	seg41,seg42,seg43,seg44,seg45,seg46,seg47 : out std_logic; y : out std_logic);
+	seg41,seg42,seg43,seg44,seg45,seg46,seg47 : out std_logic; y1,y2,y3 : out std_logic);
 end clock;
 
 architecture arch of clock is
@@ -20,12 +20,18 @@ architecture arch of clock is
 	signal seg_enc2_out : std_logic_vector(6 downto 0) := "0000000";
 	signal seg_enc3_out : std_logic_vector(6 downto 0) := "0000000";
 	signal seg_enc4_out : std_logic_vector(6 downto 0) := "0000000";
+	signal btn_din : std_logic_vector(2 downto 0) := "000";
+	signal mode : std_logic_vector(2 downto 0) := "000";
 begin
 	prescaler : entity work.prescaler port map(clk => clk, y => prescaler_out);
 	clk_in <= prescaler_out(0) when btn = '1' else prescaler_out(2);
 	counter_5 : entity work.counter port map(clk => clk, en => clk_in, rst => clk_5_det_max, dout => clk_5_out);
 	clk_5_det_max <= clk_5_out(2) and clk_5_out(1);
 	segments : entity work.segments port map(clk => clk, en => clk_5_det_max, seg1 => seg_enc1_out, seg2 => seg_enc2_out, seg3 => seg_enc3_out, seg4 => seg_enc4_out);
+	btn_din(2) <= not btn1;
+	btn_din(1) <= not btn2;
+	btn_din(0) <= not btn3;
+	mode : entity work.mode port map(clk => clk, btn1 => btn_din(2), btn2 => btn_din(1), btn3 => btn_din(0), y3 => mode(2), mode(1)=> y2, y1 => mode(0));
 	seg11 <= seg_enc1_out(6);
 	seg12 <= seg_enc1_out(5);
 	seg13 <= seg_enc1_out(4);
